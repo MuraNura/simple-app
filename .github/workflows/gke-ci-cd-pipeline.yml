@@ -1,0 +1,54 @@
+name: CI/CD Pipeline for GKE
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set Up Docker Build
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/simple-app:${{ github.sha }} .
+        docker push ${{ secrets.DOCKER_USERNAME }}/simple-app:${{ github.sha }}
+
+  deploy-to-gke:
+    name: Deploy to GKE
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to GCP
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set Up gcloud
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure kubectl
+      run: |
+        gcloud container clusters get-credentials <CLUSTER_NAME> --region <REGION> --project <PROJECT_ID>
+
+    - name: Update Kubernetes Deployment
+      run: |
+        kubectl set image deployment/simple-app simple-app=${{ secrets.DOCKER_USERNAME }}/simple-app:${{ github.sha }} --record
