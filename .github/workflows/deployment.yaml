@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
       - name: simple-app
-        image: muranura/simple-app:1cce8eeba7c9886013976bf16eb4f44812148e68
+        image: ${{ secrets.DOCKER_USERNAME }}/simple-app:latest
         ports:
         - containerPort: 80

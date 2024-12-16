@@ -49,17 +49,15 @@ jobs:
       with:
         export_default_credentials: true
 
-    - name: Install Required Tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y kubectl
-        gcloud components install gke-gcloud-auth-plugin
-
     - name: Configure kubectl
       run: |
         gcloud container clusters get-credentials fuchicorp-cluster \
           --region us-west1 --project muranura01
 
+    - name: Apply Kubernetes Manifest
+      run: |
+        kubectl apply -f deployment.yaml --namespace tools
+
     - name: Update Kubernetes Deployment
       run: |
-        kubectl set image deployment/simple-app simple-app=${{ secrets.DOCKER_USERNAME }}/simple-app:${{ github.sha }} --record --namespace tools
+        kubectl set image deployment/simple-app simple-app=${{ secrets.DOCKER_USERNAME }}/simple-app:${{ github.sha }} --namespace tools
