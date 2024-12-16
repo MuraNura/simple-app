@@ -46,10 +46,19 @@ jobs:
 
     - name: Set Up gcloud
       uses: google-github-actions/setup-gcloud@v1
+      with:
+        export_default_credentials: true
+
+    - name: Install Required Tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y kubectl
+        gcloud components install gke-gcloud-auth-plugin
 
     - name: Configure kubectl
       run: |
-        gcloud container clusters get-credentials fuchicorp-cluster --region us-west1 --project muranura01
+        gcloud container clusters get-credentials fuchicorp-cluster \
+          --region us-west1 --project muranura01
 
     - name: Update Kubernetes Deployment
       run: |
