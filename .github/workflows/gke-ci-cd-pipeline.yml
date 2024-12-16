@@ -56,7 +56,7 @@ jobs:
 
     - name: Apply Kubernetes Manifest
       run: |
-        kubectl apply -f deployment.yaml --namespace tools
+        kubectl apply -f ./.github/workflows/deployment.yaml --namespace tools
 
     - name: Update Kubernetes Deployment
       run: |
