@@ -62,4 +62,4 @@ jobs:
 
     - name: Update Kubernetes Deployment
       run: |
-        kubectl set image deployment/simple-app simple-app=${{ secrets.DOCKER_USERNAME }}/simple-app:${{ github.sha }} --record
+        kubectl set image deployment/simple-app simple-app=${{ secrets.DOCKER_USERNAME }}/simple-app:${{ github.sha }} --record --namespace tools
